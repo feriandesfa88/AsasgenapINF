@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAS Genap T.P. 2025/2026 - SMAN 1 Ngambur</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase Web SDK Core & Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+  </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col antialiased">
+
+  <!-- TOP BAR -->
+  <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-md py-4 px-6 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Logo SMAN 1 Ngambur (Represented beautifully with dynamic SVG) -->
+        <div class="bg-white p-2 rounded-full shadow-inner flex items-center justify-center w-10 h-10">
+          <svg class="w-6 h-6 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold tracking-wider uppercase md:text-base leading-tight">SMAN 1 NGAMBUR</h1>
+          <p class="text-xs text-teal-200 font-medium">SAS GENAP T.P. 2025/2026</p>
+        </div>
+      </div>
+      <div id="header-timer" class="hidden flex items-center gap-2 bg-emerald-950/40 border border-teal-500/30 px-3 py-1.5 rounded-full">
+        <i class="fa-regular fa-clock text-amber-400 animate-pulse"></i>
+        <span id="timer-text" class="text-sm md:text-base font-mono font-bold text-amber-300">90:00</span>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-admin-gate" onclick="openAdminGate()" class="text-teal-100 hover:text-white text-xs bg-teal-800/60 hover:bg-teal-700/60 px-3 py-1.5 rounded-lg border border-teal-600/40 transition">
+          <i class="fa-solid fa-user-shield mr-1"></i> Guru
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+    <!-- SCREEN 1: LOGIN & TOKEN VERIFICATION -->
+    <section id="screen-login" class="max-w-md w-full mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="inline-flex p-3 bg-emerald-50 text-emerald-700 rounded-2xl mb-2">
+          <i class="fa-solid fa-graduation-cap text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-800">Registrasi Peserta Ujian</h2>
+        <p class="text-slate-500 text-sm">Silakan lengkapi identitas Anda dengan benar untuk memulai ujian informatika.</p>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Nama Lengkap Siswa</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+              <i class="fa-regular fa-user"></i>
+            </span>
+            <input type="text" id="input-nama" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition" placeholder="Masukkan nama lengkap sesuai absen">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Kelas / Rombel</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+              <i class="fa-solid fa-school-flag"></i>
+            </span>
+            <select id="select-kelas" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition appearance-none">
+              <option value="" disabled selected>Pilih Kelas</option>
+              <option value="XI 1">XI 1</option>
+              <option value="XI 2">XI 2</option>
+              <option value="XI 3">XI 3</option>
+            </select>
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 pointer-events-none">
+              <i class="fa-solid fa-chevron-down text-xs"></i>
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Token Soal</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+              <i class="fa-solid fa-key"></i>
+            </span>
+            <input type="password" id="input-token" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition" placeholder="Masukkan token pengawas">
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 space-y-1">
+          <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Peraturan Keamanan Ketat:</p>
+          <ul class="list-disc list-inside space-y-0.5 text-amber-700/90">
+            <li>Sistem akan mendeteksi segala upaya memindahkan tab browser/membuka aplikasi lain.</li>
+            <li>Setiap perpindahan tab akan memicu sistem peringatan keras.</li>
+            <li>Batas maksimal pelanggaran adalah <strong>3 Kali</strong> sebelum otomatis ter-submit!</li>
+          </ul>
+        </div>
+
+        <button onclick="prosesLogin()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-3.5 rounded-xl transition shadow-lg shadow-emerald-700/20 hover:shadow-emerald-700/30 flex items-center justify-center gap-2">
+          Mulai Ujian <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: EXAM WORKSPACE -->
+    <section id="screen-exam" class="hidden flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <!-- Left Area: Question Container -->
+      <div class="lg:col-span-8 bg-white rounded-2xl shadow-md border border-slate-100 flex flex-col min-h-[500px]">
+        <!-- Top Status Bar -->
+        <div class="border-b border-slate-100 px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50 rounded-t-2xl">
+          <div class="flex items-center gap-2">
+            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Informatika - Kelas XI</span>
+            <span id="label-soal-aktif" class="text-slate-600 font-semibold text-sm">Soal 1 dari 40</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="badge-warning" class="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation animate-bounce"></i> Pelanggaran: 0/3
+            </span>
+          </div>
+        </div>
+
+        <!-- Question Body -->
+        <div class="p-6 md:p-8 flex-1 space-y-6">
+          <div class="space-y-4">
+            <div class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Pertanyaan</div>
+            <h3 id="teks-soal" class="text-base md:text-lg font-medium text-slate-800 leading-relaxed">
+              Memuat naskah atau storyboard...
+            </h3>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Pilihan Jawaban</div>
+            
+            <div id="container-opsi" class="space-y-3">
+              <!-- Dynamically populated options -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="border-t border-slate-100 px-6 py-4 flex items-center justify-between bg-slate-50/50 rounded-b-2xl">
+          <button id="btn-prev" onclick="keSoalSebelumnya()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-chevron-left text-xs"></i> Sebelumnya
+          </button>
+          
+          <button id="btn-next" onclick="keSoalBerikutnya()" class="px-5 py-2.5 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-semibold text-sm transition flex items-center gap-2">
+            Berikutnya <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Area: Sidebar Navigation Grid -->
+      <div class="lg:col-span-4 space-y-6">
+        <!-- Identity Widget -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-md border border-slate-700/30">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow">
+              <span id="avatar-initial">S</span>
+            </div>
+            <div>
+              <h4 id="identity-nama" class="font-bold text-slate-100 truncate max-w-[200px]">Nama Siswa</h4>
+              <p id="identity-kelas" class="text-xs text-slate-300">Kelas XI 1</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Grid Card -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Daftar Nomor Soal</h4>
+            <span id="nav-answered-badge" class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-md font-medium">0 Terjawab</span>
+          </div>
+
+          <!-- Question Grid -->
+          <div id="grid-soal" class="grid grid-cols-5 gap-2 max-h-[220px] overflow-y-auto pr-1 no-scrollbar">
+            <!-- 1 to 40 buttons will be generated dynamically -->
+          </div>
+
+          <hr class="border-slate-100">
+
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-600 rounded"></span> Terjawab</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-white border border-slate-300 rounded"></span> Belum</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-600 rounded"></span> Aktif</span>
+          </div>
+
+          <button onclick="mintaKonfirmasiSelesai()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-rose-600/10 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Selesaikan Ujian
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 3: TEST RESULTS & COMPREHENSIVE REVIEW -->
+    <section id="screen-result" class="hidden max-w-3xl w-full mx-auto space-y-6 py-6">
+      
+      <!-- Top Score Summary Banner -->
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden text-center">
+        <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white py-8 px-6 space-y-2">
+          <div class="inline-flex p-3 bg-white/10 rounded-full mb-1">
+            <i class="fa-solid fa-circle-check text-4xl text-emerald-300"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold tracking-tight">Sumatif Akhir Semester Selesai</h2>
+          <p class="text-teal-100/90 text-sm max-w-md mx-auto">Nilai Anda telah dihitung secara transparan dan data respon telah terkirim ke server guru.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 border-b border-slate-100 bg-slate-50/50">
+          <div class="py-6 px-4">
+            <div class="text-3xl md:text-4xl font-extrabold text-slate-800" id="res-score">0</div>
+            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Nilai Akhir (Skor)</div>
+          </div>
+          <div class="py-6 px-4">
+            <div class="text-2xl font-bold text-emerald-600" id="res-correct">0 / 40</div>
+            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Benar</div>
+          </div>
+          <div class="py-6 px-4">
+            <div class="text-2xl font-bold text-rose-600" id="res-wrong">0 / 40</div>
+            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Salah</div>
+          </div>
+          <div class="py-6 px-4">
+            <div class="text-2xl font-bold text-slate-700" id="res-violations">0 / 3</div>
+            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Pelanggaran Tab</div>
+          </div>
+        </div>
+
+        <div class="p-6 bg-slate-50 flex flex-col sm:flex-row justify-center items-center gap-4">
+          <div class="text-start space-y-1">
+            <h4 class="font-bold text-slate-800 text-sm" id="res-nama-siswa">Nama: -</h4>
+            <p class="text-xs text-slate-500" id="res-kelas-siswa">Kelas: -</p>
+          </div>
+          <div class="sm:ml-auto flex gap-2">
+            <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl hover:bg-slate-100 transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-print"></i> Cetak Halaman
+            </button>
+            <button onclick="location.reload()" class="px-4 py-2 bg-emerald-700 text-white font-semibold text-xs rounded-xl hover:bg-emerald-800 transition flex items-center gap-1.5 shadow shadow-emerald-700/15">
+              <i class="fa-solid fa-rotate-left"></i> Selesai & Keluar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comprehensive Review List Accordion -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+            <i class="fa-solid fa-book-open-reader text-emerald-700"></i> Review & Pembahasan Soal
+          </h3>
+          <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Bobot: 2,5 Poin / Soal</span>
+        </div>
+
+        <div id="review-list-container" class="space-y-4">
+          <!-- Dynamically populated review cards -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SCREEN 4: GURU / TEACHER DASHBOARD (ADMIN GATE) -->
+    <section id="screen-admin" class="hidden max-w-5xl w-full mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8 space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
+        <div class="space-y-1">
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-user-tie text-emerald-700"></i> Panel Administrasi Guru
+          </h2>
+          <p class="text-slate-500 text-xs">Pantau hasil sumatif akhir semester genap siswa SMAN 1 Ngambur.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-xl transition flex items-center gap-1.5 shadow shadow-emerald-700/10">
+            <i class="fa-solid fa-file-excel"></i> Ekspor Spreadsheet (CSV)
+          </button>
+          <button onclick="keluarAdmin()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left-long"></i> Kembali ke Ujian
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="flex flex-wrap gap-3 items-center bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-slate-500">Filter Kelas:</span>
+          <select id="filter-admin-kelas" onchange="applyAdminFilter()" class="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 font-medium focus:ring-1 focus:ring-emerald-600 focus:outline-none">
+            <option value="ALL">Semua Kelas</option>
+            <option value="XI 1">XI 1</option>
+            <option value="XI 2">XI 2</option>
+            <option value="XI 3">XI 3</option>
+          </select>
+        </div>
+        <button onclick="refreshDataAdmin()" class="ml-auto px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-100 rounded-lg font-semibold flex items-center gap-1 transition">
+          <i class="fa-solid fa-arrows-rotate text-emerald-700"></i> Segarkan Data
+        </button>
+      </div>
+
+      <!-- Grades Table -->
+      <div class="overflow-x-auto border border-slate-100 rounded-xl shadow-inner">
+        <table class="w-full text-left border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-100 uppercase tracking-wider">
+              <th class="py-3.5 px-4">No.</th>
+              <th class="py-3.5 px-4">Nama Siswa</th>
+              <th class="py-3.5 px-4">Kelas</th>
+              <th class="py-3.5 px-4">Waktu Submit</th>
+              <th class="py-3.5 px-4 text-center">Jumlah Benar</th>
+              <th class="py-3.5 px-4 text-center">Jumlah Salah</th>
+              <th class="py-3.5 px-4 text-center">Pelanggaran</th>
+              <th class="py-3.5 px-4 text-right">Nilai Akhir</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Row items populated dynamically -->
+            <tr>
+              <td colspan="8" class="text-center py-12 text-slate-400 font-medium">Memuat data dari cloud database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS SECTION -->
+  
+  <!-- 1. STRICT WARNING MODAL FOR CHEATING ATTEMPTS -->
+  <div id="modal-warning" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-rose-100 p-6 space-y-4 text-center animate-pulse">
+      <div class="inline-flex p-4 bg-rose-50 text-rose-600 rounded-full">
+        <i class="fa-solid fa-triangle-exclamation text-4xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-rose-800">PERINGATAN KECURANGAN!</h3>
+      <p class="text-slate-600 text-sm leading-relaxed">
+        Anda terdeteksi keluar dari area ujian (pindah tab browser, meminimalkan aplikasi, atau membuka tab baru).
+      </p>
+      <div class="bg-rose-50 border border-rose-100 rounded-xl py-3.5 px-5">
+        <div class="text-xs text-rose-700 font-bold uppercase tracking-wider">Jumlah Pelanggaran Anda</div>
+        <div class="text-3xl font-extrabold text-rose-600 mt-1" id="modal-warning-count">1 / 3</div>
+        <p class="text-[10px] text-rose-600/80 mt-1.5 font-medium">*Bila menyentuh batas 3 kali, ujian Anda langsung selesai dan terkirim otomatis!</p>
+      </div>
+      <button onclick="closeWarningModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl transition shadow shadow-rose-600/10">
+        Saya Berjanji Tidak Mengulangi & Kembali ke Ujian
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. ADMIN LOCK PASSWORD MODAL -->
+  <div id="modal-admin-lock" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-xs w-full p-6 space-y-4">
+      <div class="text-center space-y-1">
+        <h4 class="font-bold text-slate-800">Verifikasi Sandi Guru</h4>
+        <p class="text-slate-500 text-xs">Gunakan PIN guru untuk membuka panel hasil nilai.</p>
+      </div>
+      <div class="space-y-3">
+        <input type="password" id="input-admin-pin" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-center tracking-widest text-sm font-bold focus:outline-none focus:ring-1 focus:ring-emerald-600" placeholder="PIN GURU">
+        <div class="flex gap-2">
+          <button onclick="submitAdminPIN()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 rounded-xl text-xs transition">
+            Masuk
+          </button>
+          <button onclick="closeAdminLock()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-xl text-xs transition">
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. GENERAL NOTIFICATION / CUSTOM ALERTS -->
+  <div id="custom-toast" class="hidden fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-sm border border-slate-700 animate-slide-up">
+    <span id="toast-icon" class="text-emerald-400"><i class="fa-solid fa-circle-info"></i></span>
+    <span id="toast-text" class="font-medium">Notifikasi Sistem</span>
+  </div>
+
+  <!-- SOAL DATABASE SMAN 1 NGAMBUR (40 Multiple-Choice Questions) -->
+  <script>
+    const examQuestions = [
+      {
+        id: 1,
+        question: "Berdasarkan prinsip desain yang efektif, bagaimana cara terbaik untuk menciptakan konten digital yang menarik secara visual?",
+        options: [
+          "Menggunakan warna, tata letak, dan desain yang konsisten",
+          "Menghindari penggunaan gambar agar tetap fokus pada teks",
+          "Menggunakan kombinasi font yang sebanyak mungkin",
+          "Membuat desain yang selalu berwarna hitam dan putih",
+          "Mengabaikan pemilihan ukuran gambar dalam desain"
+        ],
+        answer: 0,
+        explanation: "Prinsip dasar visual mensyaratkan adanya konsistensi tata letak, font, serta pemilihan warna yang serasi agar audiens merasa nyaman dan terfokus pada pesan utama."
+      },
+      {
+        id: 2,
+        question: "Alat desain digital seperti Canva menawarkan berbagai kemudahan dalam pembuatan konten, berdasarkan fungsi dan fitur yang dimilikinya, mengapa penggunaan alat desain seperti Canva sangat membantu dalam pembuatan konten digital?",
+        options: [
+          "Menggunakan banyak template dan elemen desain yang sudah siap pakai",
+          "Tidak memungkinkan pengguna untuk mengedit gambar",
+          "Hanya mendukung penggunaan desain minimalis",
+          "Mengharuskan pengguna menguasai pemrograman",
+          "Tidak mendukung berbagai format file desain"
+        ],
+        answer: 0,
+        explanation: "Canva menyediakan ribuan template siap pakai dan antarmuka drag-and-drop sederhana, sehingga desainer pemula pun dapat dengan mudah menghasilkan media grafis berkualitas tinggi."
+      },
+      {
+        id: 3,
+        question: "Perkembangan teknologi informasi memudahkan seseorang untuk berbagi berita dengan cepat melalui berbagai platform, termasuk grup WhatsApp. Namun, tidak semua informasi yang beredar memiliki kebenaran yang jelas. Dalam suatu kasus, seseorang menyebarkan berita yang belum terverifikasi sehingga menimbulkan keresahan di masyarakat. Berdasarkan teks tersebut, langkah terbaik yang seharusnya dilakukan adalah...",
+        options: [
+          "Ikut menyebarkan agar cepat viral",
+          "Menghapus pesan tanpa tindakan lain",
+          "Memverifikasi informasi sebelum menyebarkan",
+          "Menyimpan sebagai koleksi pribadi",
+          "Mengabaikan sepenuhnya"
+        ],
+        answer: 2,
+        explanation: "Pentingnya literasi informasi menuntut pengguna menyaring dan melakukan pemeriksaan fakta (fact check) sebelum menyebarkan berita demi menangkal hoaks."
+      },
+      {
+        id: 4,
+        question: "Sebuah organisasi mengunggah video edukasi berdurasi panjang di media sosial, tetapi kurang mendapatkan perhatian. Berdasarkan konsep penyajian konten digital, tindakan yang tepat untuk meningkatkan minat penonton adalah...",
+        options: [
+          "Memotong video menjadi cuplikan pendek yang menarik perhatian",
+          "Menambahkan subtitle dengan font kecil agar lebih informatif",
+          "Mengganti format video menjadi slideshow gambar",
+          "Menambahkan efek suara yang keras di seluruh video",
+          "Mempromosikan video secara agresif melalui iklan"
+        ],
+        answer: 0,
+        explanation: "Rentang perhatian (attention span) audiens di internet cenderung pendek. Memotong video panjang menjadi bentuk mikro-konten yang atraktif dapat memicu peningkatan interaksi."
+      },
+      {
+        id: 5,
+        question: "Seorang siswa ingin membuat konten digital berupa video edukasi. Ia memiliki beberapa langkah berikut:<br>1. Mengedit video<br>2. Menentukan tujuan dan ide konten<br>3. Mempublikasikan konten<br>4. Mengumpulkan bahan (gambar, video, data)<br>5. Membuat naskah atau storyboard<br><br>Agar proses pembuatan konten berjalan efektif dan sistematis, urutan langkah yang paling tepat adalah...",
+        options: [
+          "2-5-4-1-3",
+          "2-4-5-1-3",
+          "4-2-5-1-3",
+          "5-2-4-1-3",
+          "2-5-1-4-3"
+        ],
+        answer: 0,
+        explanation: "Urutan kerja produksi video yang runtut: 1. Ide (2), 2. Storyboard (5), 3. Aset (4), 4. Editing (1), dan 5. Publikasi (3)."
+      },
+      {
+        id: 6,
+        question: "Seorang peserta didik ingin membuat poster kampanye lingkungan hidup dengan desain modern tetapi tidak memiliki keahlian desain grafis yang cukup baik. Aplikasi AI yang sebaiknya digunakan adalah...",
+        options: [
+          "Microsoft Paint",
+          "Leonardo AI",
+          "Audacity",
+          "Notepad",
+          "Excel"
+        ],
+        answer: 1,
+        explanation: "Leonardo AI merupakan platform Image Generator bertenaga AI yang mampu mengonversi deskripsi teks (prompt) menjadi karya ilustrasi atau poster artistik berskala profesional."
+      },
+      {
+        id: 7,
+        question: "Sebuah konten digital bertema lingkungan menampilkan gambar tumpukan sampah dengan teks ajakan mengurangi penggunaan plastik, namun kurang menarik perhatian audiens. Berdasarkan pemahaman tentang prinsip desain visual, cara yang tepat untuk membuat konten lebih menarik adalah...",
+        options: [
+          "Menghindari elemen visual untuk fokus pada pesan teks",
+          "Memuat data statistik secara rinci pada desain utama",
+          "Menggunakan font yang lebih besar dengan warna mencolok",
+          "Mengganti tema menjadi lebih universal tanpa menyebut plastik",
+          "Menambahkan ilustrasi yang menggambarkan dampak positif pengurangan sampah"
+        ],
+        answer: 4,
+        explanation: "Menggambarkan citra solusi positif masa depan (dampak baik pengurangan plastik) jauh lebih memotivasi psikologi audiens ketimbang terus menampilkan rasa bersalah."
+      },
+      {
+        id: 8,
+        question: "Sebuah konten digital dianggap efektif jika mampu mencapai tujuan komunikasinya. Evaluasilah pernyataan-pernyataan berikut:<br>1) Menggunakan bahasa yang sesuai dengan tingkat pemahaman target audiens.<br>2) Memilih platform distribusi yang paling sering diakses oleh kelompok sasaran.<br>3) Menambahkan elemen dekoratif sebanyak mungkin agar visual terlihat mewah.<br>4) Menyampaikan pesan inti (call to action) secara jelas dan tidak bertele-tele.<br><br>Prinsip efektivitas yang paling krusial agar pesan diterima dengan baik oleh audiens adalah nomor...",
+        options: [
+          "1, 2, dan 3",
+          "1, 2, dan 4",
+          "1, 3, dan 4",
+          "2, 3, dan 4",
+          "Semua benar"
+        ],
+        answer: 1,
+        explanation: "Pernyataan 3 tidak tepat karena dekorasi berlebih (over-decoration) justru merusak hierarki visual dan mengaburkan pesan fokus utama."
+      },
+      {
+        id: 9,
+        question: "Konten digital hadir dalam berbagai bentuk, termasuk teks, gambar, audio, dan video. Berdasarkan kategorinya, manakah dari pilihan berikut yang merupakan contoh konten digital berbasis audio?",
+        options: [
+          "Ilustrasi",
+          "Podcast",
+          "Infografis",
+          "Poster",
+          "Vlog"
+        ],
+        answer: 1,
+        explanation: "Podcast adalah siaran audio non-siaran langsung yang dapat didengarkan kapan saja, menjadikannya format murni berbasis audio digital."
+      },
+      {
+        id: 10,
+        question: "Seorang peserta didik membuat konten digital edukasi tentang daur ulang. Konten tersebut memuat infografik yang kompleks, sehingga audiens kesulitan memahaminya. Cara untuk meningkatkan daya tarik dan efektivitas konten adalah...",
+        options: [
+          "Menghapus infografik dan menggantinya dengan teks narasi Panjang",
+          "Menyederhanakan infografik menjadi poin-poin utama yang relevan",
+          "Menggunakan warna kontras tinggi untuk semua elemen desain",
+          "Menambahkan animasi pada infografik agar lebih dinamis",
+          "Mengganti tema konten agar lebih sederhana"
+        ],
+        answer: 1,
+        explanation: "Inti dari infografik adalah simplifikasi informasi. Jika dirasa rumit, maka mengurangi keruwetan dan mempertahankan data-data inti adalah solusi yang paling logis."
+      },
+      {
+        id: 11,
+        question: "Pesan yang disampaikan dalam konten digital memiliki peran yang sangat penting dalam menarik perhatian audiens. Untuk mencapai tujuan tersebut, bagaimana sebaiknya pesan dalam konten digital disampaikan agar efektif dan mudah dipahami oleh audiens?",
+        options: [
+          "Disampaikan dengan cara yang rumit agar terlihat profesional",
+          "Fokus pada satu ide utama dan mudah dipahami",
+          "Berisi banyak informasi yang tidak berkaitan satu sama lain",
+          "Selalu panjang agar audiens mendapatkan banyak informasi sekaligus",
+          "Ditampilkan dalam bentuk tabel agar lebih jelas"
+        ],
+        answer: 1,
+        explanation: "Satu konten digital harus fokus menyampaikan satu ide tunggal secara ringkas agar audiens menangkap poin penting tersebut dengan cepat saat melakukan scrolling."
+      },
+      {
+        id: 12,
+        question: "Sebuah lembaga kesehatan ingin mengedukasi masyarakat awam mengenai cara mencegah penyebaran virus musiman melalui media sosial dan situs web. Mereka harus memilih antara menulis Artikel Ilmiah yang sangat teknis atau Artikel Blog yang populer. Evaluasilah keputusan manakah yang paling tepat untuk mencapai efektivitas komunikasi tersebut?",
+        options: [
+          "Memilih Artikel Ilmiah karena standar keakuratan datanya lebih tinggi dan lebih sulit dibantah oleh orang awam.",
+          "Memilih Artikel Blog karena penggunaan gaya bahasa yang santai dan struktur yang fleksibel lebih mudah dipahami serta memicu interaksi publik.",
+          "Menggunakan Artikel Ilmiah agar lembaga terlihat lebih profesional meskipun audiens kesulitan memahaminya.",
+          "Mengabaikan kedua format tersebut dan hanya menggunakan teks pendek tanpa data karena audiens digital tidak suka membaca.",
+          "Memilih Artikel Blog hanya jika lembaga tersebut tidak memiliki data riset yang valid untuk ditampilkan."
+        ],
+        answer: 1,
+        explanation: "Menyampaikan edukasi bagi khalayak ramai (awam) mensyaratkan pemilihan gaya bahasa populer, interaktif, dan mudah dimengerti yang diakomodasi dengan baik oleh format blog."
+      },
+      {
+        id: 13,
+        question: "Seorang guru ingin membagikan materi pelajaran kepada siswanya yang berada di luar kota secara instan. Ia mempertimbangkan dua opsi: mengirimkan Buku Cetak melalui ekspedisi atau mengunggah E-book (PDF) ke cloud storage. Manakah evaluasi yang paling tepat mengenai perbedaan kedua media tersebut dalam konteks konten digital?",
+        options: [
+          "Buku cetak lebih efektif karena memiliki ketahanan fisik yang lebih baik daripada file digital.",
+          "Keduanya adalah konten digital karena sama-sama mengandung teks dan gambar yang bertujuan memberikan informasi.",
+          "Buku cetak akan menjadi konten digital jika guru tersebut membacanya di depan kamera saat melakukan panggilan video.",
+          "E-book bukan konten digital karena tidak memiliki fitur audio yang bisa didengarkan secara otomatis.",
+          "E-book dikategorikan sebagai konten digital karena informasinya telah dikonversi menjadi kode biner yang dapat ditransmisikan melalui jaringan internet."
+        ],
+        answer: 4,
+        explanation: "Format data digital merujuk pada bentuk berkas yang dikodekan ke dalam format elektronik berbasis biner agar dapat disimpan di media digital dan dikirim lewat infrastruktur web."
+      },
+      {
+        id: 14,
+        question: "Dalam membuat desain visual, seorang desainer perlu memperhatikan beberapa prinsip dasar agar pesan dapat tersampaikan dengan baik kepada audiens. Salah satu prinsip yang penting adalah konsistensi dalam penggunaan warna, jenis huruf, dan tata letak. Konsistensi ini membantu audiens memahami informasi dengan lebih cepat dan membuat tampilan terlihat lebih rapi serta profesional. Berdasarkan teks tersebut, elemen kunci yang harus diperhatikan untuk menciptakan desain visual yang menarik dan mudah dipahami audiens adalah...",
+        options: [
+          "Menggunakan berbagai warna dan font yang berbeda agar terlihat unik",
+          "Mengutamakan konsistensi dalam warna, font, dan tata letak",
+          "Menambahkan elemen dekoratif sebanyak mungkin",
+          "Mengubah gaya desain pada setiap bagian agar tidak monoton",
+          "Menggunakan desain sederhana tanpa memperhatikan keseragaman"
+        ],
+        answer: 1,
+        explanation: "Prinsip konsistensi visual menjamin kerapian, menumbuhkan persepsi yang seragam, dan mempercepat pemahaman kognitif pengguna."
+      },
+      {
+        id: 15,
+        question: "Dalam sebuah kampanye digital, penggunaan warna latar belakang yang terlalu mencolok dapat mengganggu fokus audiens terhadap pesan utama. Berdasarkan pemahaman tentang prinsip desain visual, solusi yang tepat adalah...",
+        options: [
+          "Menambahkan lebih banyak warna mencolok agar desain semakin menarik",
+          "Menggunakan warna latar yang lebih lembut agar pesan utama lebih terlihat",
+          "Mengganti seluruh teks menjadi warna yang sama dengan latar belakang",
+          "Menghilangkan semua elemen visual agar tidak mengganggu pesan",
+          "Memperbesar ukuran latar belakang agar lebih dominan"
+        ],
+        answer: 1,
+        explanation: "Menggunakan warna latar belakang pastel atau kalem (lembut) memberikan kontras yang nyaman bagi mata pembaca untuk berfokus pada elemen teks pesan utama."
+      },
+      {
+        id: 16,
+        question: "Sebagai jenis konten gambar, meme memiliki cara unik dalam menyampaikan pesan. Pilihlah pernyataan yang paling menggambarkan fungsi utama meme...",
+        options: [
+          "Memberikan informasi akademik secara formal",
+          "Menyampaikan pesan humoris atau sindiran secara ringan",
+          "Mengajarkan keterampilan teknis",
+          "Mendesain presentasi yang professional",
+          "Membuat grafik ilmiah untuk penelitian"
+        ],
+        answer: 1,
+        explanation: "Meme adalah media komunikasi siber berbasis sarkasme, parodi, atau guyonan jenaka yang dirancang agar lekas dimengerti dan disebarkan ulang."
+      },
+      {
+        id: 17,
+        question: "Untuk membuat konten yang menarik secara visual, ada beberapa hal penting yang perlu diperhatikan. Namun, tidak semua elemen desain harus digunakan secara berlebihan. Manakah dari pilihan berikut yang tidak termasuk dalam hal-hal yang perlu diperhatikan untuk membuat konten visual yang menarik?",
+        options: [
+          "Pemilihan warna yang menarik",
+          "Penggunaan font yang sesuai dan konsisten",
+          "Ukuran gambar yang tepat",
+          "Membuat konten yang sangat penuh warna",
+          "Tata letak yang mudah dibaca dan dimengerti"
+        ],
+        answer: 3,
+        explanation: "Mengisi kanvas desain dengan warna-warna acak yang berlebihan justru memicu distorsi visual dan membuat konten terasa amatir."
+      },
+      {
+        id: 18,
+        question: "Sebuah konten media sosial tentang pengelolaan sampah plastik tidak mendapatkan respons dari audiens meskipun menggunakan desain menarik. Cara untuk meningkatkan interaksi pada konten tersebut adalah...",
+        options: [
+          "menggunakan efek visual yang lebih mencolok",
+          "meningkatkan frekuensi posting konten serupa",
+          "menghapus elemen desain untuk fokus pada teks",
+          "mengganti tema menjadi topik yang lebih kontroversial",
+          "menambahkan ajakan langsung untuk berdiskusi pada akhir konten"
+        ],
+        answer: 4,
+        explanation: "Call to Action (CTA) yang berorientasi mengundang diskusi (seperti melempar pertanyaan balik) terbukti efektif menaikkan tingkat keterlibatan komentar pada algoritma media sosial."
+      },
+      {
+        id: 19,
+        question: "Sebuah komunitas pecinta lingkungan ingin membuat konten digital untuk mengajak kaum muda mengurangi penggunaan plastik sekali pakai. Agar konten tersebut mampu menciptakan keterlibatan (engagement) yang tinggi dan mendorong aksi nyata, teknik penyajian yang paling tepat diaplikasikan adalah...",
+        options: [
+          "Menampilkan data statistik global mengenai jumlah sampah plastik dalam bentuk teks panjang.",
+          "Mengunggah foto-foto pemandangan alam tanpa adanya pesan atau ajakan bertindak.",
+          "Menceritakan kisah perjalanan seorang relawan muda yang berhasil mengubah gaya hidupnya di lingkungan sekitar yang relevan dengan audiens.",
+          "Menggunakan bahasa formal dan kaku agar konten terlihat lebih profesional dan serius.",
+          "Menghindari elemen konflik agar audiens tidak merasa bersalah saat melihat konten tersebut."
+        ],
+        answer: 2,
+        explanation: "Teknik Storytelling yang membumi, nyata, dan personal (bercerita tentang aksi relawan sebaya) jauh lebih mudah memicu empati dan tindakan emulasional di kalangan anak muda."
+      },
+      {
+        id: 20,
+        question: "Video animasi pendek banyak digunakan dalam berbagai bidang, seperti edukasi, pemasaran, dan hiburan. Berdasarkan karakteristiknya, apa fungsi utama dari video animasi pendek?",
+        options: [
+          "Menyampaikan pesan secara visual dan dinamis",
+          "Mengajari keterampilan audio",
+          "Memberikan informasi dengan teks Panjang",
+          "Menggunakan efek suara tanpa gambar",
+          "Memberikan presentasi professional"
+        ],
+        answer: 0,
+        explanation: "Video animasi sanggup menyederhanakan ide abstrak, mengilustrasikan peristiwa kompleks secara grafis, serta menyampaikannya secara dinamis melalui kombinasi gerak dan suara."
+      },
+      {
+        id: 21,
+        question: "Penggunaan AI dalam pembuatan konten visual memberikan manfaat utama berupa...",
+        options: [
+          "mempermudah proses pengeditan manual",
+          "mengurangi kebutuhan akan perangkat keras",
+          "mempercepat proses produksi dan meningkatkan efisiensi",
+          "membuat konten menjadi lebih mahal dengan fitur tambahan",
+          "membatasi kreativitas manusia untuk fokus pada detail tertentu"
+        ],
+        answer: 2,
+        explanation: "Integrasi AI sanggup mengotomatisasi proses penggarapan elemen gambar/animasi kasar sehingga siklus kerja pembuatan aset visual menjadi berkali-kali lipat lebih gesit."
+      },
+      {
+        id: 22,
+        question: "Konten digital merujuk pada segala bentuk informasi yang disajikan dalam format digital dan dapat diakses melalui perangkat elektronik. Pilihlah jawaban yang paling tepat mendefinisikan konten digital dari pilihan berikut ini!",
+        options: [
+          "Informasi yang hanya berbentuk teks dan gambar",
+          "Segala bentuk informasi dalam format digital yang dapat diakses melalui perangkat elektronik",
+          "Hanya informasi berbentuk video dan audio yang tersedia di internet",
+          "Informasi yang hanya dapat diakses melalui computer",
+          "Segala bentuk informasi cetak yang dipindai ke dalam format digital"
+        ],
+        answer: 1,
+        explanation: "Definisi luas konten digital adalah semua bentuk representasi informasi yang termodifikasi menjadi data digital (biner) untuk disajikan di peranti elektronik apa pun."
+      },
+      {
+        id: 23,
+        question: "Seorang kreator konten mengalami penurunan jumlah pengunjung situs setelah mengganti format konten dari artikel singkat menjadi laporan panjang. Langkah yang paling efektif untuk mengatasi masalah tersebut adalah...",
+        options: [
+          "menyertakan ringkasan singkat di awal laporan",
+          "meningkatkan penggunaan kata kunci di laporan",
+          "menambahkan lebih banyak gambar di dalam laporan",
+          "membuat laporan dalam format PDF yang dapat diunduh",
+          "mengganti format konten kembali menjadi artikel singkat"
+        ],
+        answer: 0,
+        explanation: "Memasang sinopsis/ringkasan eksekutif (TL;DR) di awal halaman membantu pembaca daring yang sibuk untuk segera menakar poin penting dari isi laporan panjang tersebut."
+      },
+      {
+        id: 24,
+        question: "Seorang pembuat konten video ingin memastikan karyanya tetap dapat dipahami oleh penyandang tuna rungu maupun audiens yang menonton tanpa suara. Dari beberapa pilihan berikut, manakah fitur yang paling efektif dan paling beralasan untuk mencapai tujuan tersebut?",
+        options: [
+          "Menambahkan musik latar dengan ritme kuat agar video lebih menarik",
+          "Menggunakan transisi cepat agar video terlihat dinamis",
+          "Menambahkan closed captions atau subtitle yang akurat agar pesan tetap tersampaikan tanpa audio",
+          "Memberikan efek visual mencolok agar menarik perhatian",
+          "Meningkatkan resolusi video menjadi HD atau 4K agar kualitas gambar lebih baik"
+        ],
+        answer: 2,
+        explanation: "Subtitle/closed captions menerjemahkan audio percakapan menjadi representasi teks tertulis, memenuhi standar aksesibilitas inklusif bagi penonton tunarungu atau pemirsa yang sedang dalam mode senyap."
+      },
+      {
+        id: 25,
+        question: "Sebuah infografik Pendidikan menggunakan bahasa teknis yang sulit dimengerti oleh peserta didik SMA. Hal yang perlu dilakukan pembuat konten agar konten menjadi lebih inklusif adalah...",
+        options: [
+          "Menambahkan teks dalam Bahasa akademik tingkat lanjut",
+          "Menghapus semua teks dan hanya menggunakan gambar",
+          "Menggunakan Bahasa sederhana dan contoh nyata",
+          "Mengurangi jumlah informasi yang disampaikan",
+          "Mengganti infografis dengan tebal"
+        ],
+        answer: 2,
+        explanation: "Agar ramah dicerna anak sekolah, konseptualisasi materi teknis wajib disederhanakan menggunakan idiom bahasa sehari-hari yang dikombinasikan dengan analogi dunia nyata."
+      },
+      {
+        id: 26,
+        question: "Sebuah tim kreator menggunakan gambar tanpa lisensi resmi untuk konten mereka, yang kemudian dihapus oleh platform karena pelanggaran hak cipta. Langkah yang paling aman untuk mencegah hal ini di masa depan adalah...",
+        options: [
+          "menggunakan gambar dari sumber bebas lisensi atau membuat sendiri",
+          "mengompresi gambar untuk mengurangi pelacakan hak cipta",
+          "mencantumkan sumber gambar tanpa memeriksa lisensinya",
+          "mengganti gambar dengan ilustrasi yang tidak relevan",
+          "menambahkan efek visual pada gambar agar tidak terdeteksi"
+        ],
+        answer: 0,
+        explanation: "Pilar kepatuhan hak kekayaan intelektual (HAKI) menuntut penggunaan aset orisinal buatan pribadi atau berlisensi domain publik (seperti Creative Commons CC0)."
+      },
+      {
+        id: 27,
+        question: "Sebuah sekolah ingin membuat dokumentasi digital berupa video kegiatan siswa untuk diunggah ke YouTube. Agar konten tersebut tidak hanya variatif secara metode tetapi juga aman secara hukum dan etika, langkah evaluasi manakah yang paling krusial dilakukan sebelum publikasi?",
+        options: [
+          "Memastikan resolusi video sudah 4K agar terlihat profesional di berbagai perangkat digital.",
+          "Menggunakan musik latar yang sedang tren meskipun memiliki hak cipta agar algoritma YouTube lebih mudah merekomendasikan video.",
+          "Menambahkan sebanyak mungkin tagar (hashtag) yang populer meskipun tidak relevan.",
+          "Memverifikasi surat pernyataan persetujuan (consent) dari orang tua siswa yang wajahnya muncul secara jelas dalam konten.",
+          "Menghapus semua komentar di kolom YouTube untuk menghindari kritik negatif."
+        ],
+        answer: 3,
+        explanation: "Privasi anak di bawah umur dilindungi undang-undang secara ketat. Publikasi dokumentasi visual wajah murid wajib disetujui (consent) tertulis oleh orang tua demi etika hukum."
+      },
+      {
+        id: 28,
+        question: "Di era digital saat ini, media sosial menjadi sarana utama bagi siswa untuk berinteraksi dan menyampaikan pendapat. Namun, kebebasan tersebut harus diimbangi dengan tanggung jawab. Suatu hari, seorang siswa mengunggah komentar di media sosial yang berisi tuduhan terhadap temannya tanpa disertai bukti yang jelas. Akibatnya, teman tersebut mengalami kerugian secara moral dan nama baiknya tercemar. Tindakan siswa tersebut berpotensi melanggar...",
+        options: [
+          "Hak Cipta",
+          "Etika Digital saja",
+          "UU ITE tentang pencemaran nama baik",
+          "Kebebasan berpendapat",
+          "Privasi data pribadi"
+        ],
+        answer: 2,
+        explanation: "Tindakan menyebarkan tuduhan tak berdasar (fitnah) di media sosial dikategorikan sebagai delik pencemaran nama baik yang dijerat hukum oleh UU Informasi dan Transaksi Elektronik."
+      },
+      {
+        id: 29,
+        question: "Riko adalah seorang editor video yang mengambil potongan lagu populer milik seorang musisi untuk dijadikan musik latar iklan produk komersial di YouTube tanpa izin dari penciptanya. Berdasarkan penerapan UU Nomor 28 Tahun 2014, tindakan Riko dianggap melanggar hak cipta karena...",
+        options: [
+          "Lagu tersebut sudah tersedia secara gratis di platform streaming.",
+          "Riko menggunakan karya tersebut untuk tujuan komersial tanpa lisensi atau izin pencipta.",
+          "Lagu tersebut belum didaftarkan ke Direktorat Jenderal Kekayaan Intelektual.",
+          "Riko mencantumkan nama penyanyinya di kolom deskripsi video.",
+          "Video tersebut sudah mendapatkan banyak jumlah penonton (views)."
+        ],
+        answer: 1,
+        explanation: "Pemanfaatan hak cipta karya intelektual orang lain untuk meraup keuntungan finansial (komersial) tanpa membeli hak lisensi komersial adalah tindakan penjiplakan ilegal."
+      },
+      {
+        id: 30,
+        question: "Apabila poin \"menyaring konten negatif\" dalam Literasi Informasi diabaikan oleh mayoritas pengguna internet, maka konsekuensi sosial yang paling mungkin terjadi adalah...",
+        options: [
+          "Meningkatnya kecepatan akses internet di seluruh wilayah",
+          "Semakin mudahnya akses terhadap perangkat lunak gratis",
+          "Terciptanya ruang digital yang penuh dengan hoaks, ujaran kebencian, dan perpecahan",
+          "Menurunnya jumlah pembuatan konten digital secara global",
+          "Harga perangkat elektronik menjadi lebih murah karena persaingan."
+        ],
+        answer: 2,
+        explanation: "Ketidakmampuan kolektif menyaring informasi berimbas pada membanjirnya berita palsu, konflik horizontal, dan rusaknya harmoni siber di tengah masyarakat."
+      },
+      {
+        id: 31,
+        question: "Dika menganalisis peran teknologi digital dalam sistem demokrasi modern, khususnya dalam hubungan antara pemerintah dan masyarakat. Berdasarkan analisis tersebut, tujuan utama pemanfaatan teknologi digital dalam demokrasi adalah...",
+        options: [
+          "Meningkatkan ketergantungan masyarakat pada perangkat elektronik",
+          "Membatasi interaksi langsung antara pemerintah dan warga",
+          "Memperkuat partisipasi publik, transparansi, dan akuntabilitas",
+          "Mempersulit akses informasi bagi kelompok tertentu",
+          "Mengurangi peran media massa tradisional"
+        ],
+        answer: 2,
+        explanation: "Teknologi digital berperan menyederhanakan akses masyarakat untuk memantau, berpartisipasi, serta menguji keterbukaan data kinerja aparatur sipil negara."
+      },
+      {
+        id: 32,
+        question: "Perhatikan pernyataan berikut terkait keamanan akun:<br>1) Penggunaan password unik dapat meningkatkan keamanan akun<br>2) Kode OTP dapat dibagikan kepada orang terpercaya tanpa risiko<br>3) Autentikasi dua langkah memberikan perlindungan tambahan<br>4) Penggunaan password yang sama pada semua akun tetap aman selama tidak diketahui orang lain<br>5) Data pribadi harus dijaga kerahasiaannya<br><br>Pernyataan yang tidak benar adalah...",
+        options: [
+          "1) dan 3)",
+          "2) dan 4)",
+          "3) dan 5)",
+          "1), 2), dan 3)",
+          "2), 3), dan 4)"
+        ],
+        answer: 1,
+        explanation: "Pernyataan 2 keliru karena OTP adalah kunci darurat super rahasia. Pernyataan 4 keliru karena menggunakan satu kata sandi yang sama di semua tempat memicu kebocoran massal jika salah satu platform diretas."
+      },
+      {
+        id: 33,
+        question: "Seorang pembuat konten menyadari bahwa audiensnya adalah kelompok dengan kebutuhan khusus. Langkah yang paling relevan untuk memastikan aksesibilitas konten adalah...",
+        options: [
+          "Menambahkan teks alternatif pada gambar dan subtitle pada video",
+          "Menggunakan Bahasa teknis untuk menunjukan profesionalisme",
+          "Mengurangi durasi konten untuk menghemat waktu audiens",
+          "Menambahkan musik latar dengan volume tinggi",
+          "Menghapus elemen visual dari konten"
+        ],
+        answer: 0,
+        explanation: "Teks alternatif (Alt-text) menolong pembaca tuna netra memanfaatkan pembaca layar (screen reader), sementara subtitle menolong audiens tunarungu memahami isi video."
+      },
+      {
+        id: 34,
+        question: "Budi sering menggunakan Wi-Fi publik di kafe untuk melakukan transaksi perbankan. Ia merasa aman karena situs bank tersebut menggunakan protokol 'HTTPS'. Analisislah risiko yang tetap mengintai Budi dalam situasi ini.",
+        options: [
+          "HTTPS hanya melindungi data teks, sehingga transaksi yang melibatkan pemindaian wajah atau sidik jari tetap tidak aman.",
+          "Risiko utama hanya terletak pada orang di sekitar kafe yang mungkin mengintip layar ponsel Budi secara fisik.",
+          "Budi aman selama ia tidak menyimpan kata sandinya di peramban (browser) saat menggunakan Wi-Fi tersebut.",
+          "Penyerang dapat membuat 'Evil Twin' (Wi-Fi palsu) dan melakukan teknik 'Man-in-the Middle' untuk mengarahkan Budi ke situs perbankan palsu.",
+          "Tidak ada risiko karena HTTPS menjamin enkripsi data dari ujung ke ujung."
+        ],
+        answer: 3,
+        explanation: "Serangan Man-in-the-Middle lewat Evil Twin WiFi memungkinan peretas menyamar sebagai router resmi kafe untuk menyadap atau mengalihkan sambungan ke halaman login palsu."
+      },
+      {
+        id: 35,
+        question: "Dina mengaktifkan autentikasi dua langkah (2FA) pada akun pentingnya, tetapi sering membagikan kode OTP kepada orang lain saat diminta. Jika ditinjau dari prinsip perlindungan data pribadi, tindakan Dina seharusnya...",
+        options: [
+          "Dipertahankan karena mempercepat akses akun",
+          "Dianggap aman karena sudah menggunakan 2FA",
+          "Dihentikan karena OTP bersifat rahasia dan tidak boleh dibagikan",
+          "Dilanjutkan jika kepada orang yang dikenal",
+          "Tidak berpengaruh terhadap keamanan data"
+        ],
+        answer: 2,
+        explanation: "OTP adalah kode pengaman lapis kedua sekali pakai. Membagikan kode OTP kepada orang lain sama saja dengan membukakan pintu rumah secara sukarela kepada penjahat."
+      },
+      {
+        id: 36,
+        question: "Nisa menggunakan manajer kata sandi dengan kata sandi utama yang kuat dan mengaktifkan autentikasi dua langkah (2FA) melalui SMS. Namun, nomor ponselnya pernah digunakan di berbagai layanan publik. Berdasarkan pemahaman tentang keamanan data pribadi, hal ini menunjukkan bahwa...",
+        options: [
+          "Sistem sudah sepenuhnya aman karena menggunakan dua lapisan keamanan",
+          "Risiko tetap ada karena SMS rentan terhadap penyalahgunaan seperti SIM swap",
+          "Tidak ada risiko karena OTP hanya dikirim ke nomor pribadi",
+          "Manajer kata sandi tidak berpengaruh terhadap keamanan data",
+          "Risiko hanya terjadi jika password lemah"
+        ],
+        answer: 1,
+        explanation: "Metode 2FA berbasis jaringan seluler (SMS) rentan terhadap pembajakan SIM Swap, di mana peretas mengelabui provider seluler untuk mengaktifkan duplikat kartu SIM korban."
+      },
+      {
+        id: 37,
+        question: "Seorang pengguna hendak mendaftar pada sebuah platform digital yang meminta berbagai data pribadi. Sebelum menyetujui permintaan tersebut, pengguna perlu melakukan pertimbangan kritis terkait keamanan dan penggunaan datanya. Berdasarkan hal tersebut, prinsip apa yang paling tepat untuk dipahami sebelum memberikan persetujuan?",
+        options: [
+          "Semakin banyak data yang dibagikan, semakin banyak keuntungan gratis yang diperoleh.",
+          "Semua data pribadi pasti terlindungi sepenuhnya oleh sistem enkripsi global.",
+          "Platform digital tidak memiliki hak untuk menyimpan data pengguna dalam bentuk apa pun.",
+          "Penting untuk membaca, memahami, dan menyetujui syarat serta kebijakan privasi secara sadar.",
+          "Seluruh data yang diberikan pasti akan diperjualbelikan kepada pihak ketiga."
+        ],
+        answer: 3,
+        explanation: "Pengguna wajib memahami dokumen Syarat Ketentuan dan Kebijakan Privasi (Privacy Policy) untuk mengontrol seberapa jauh data mereka akan diolah dan dilindungi pihak pengembang."
+      },
+      {
+        id: 38,
+        question: "Seorang pengguna loka pasar (marketplace) menerima pesan WhatsApp yang mengaku dari kurir, meminta instalasi file .APK untuk mengecek resi pengiriman. Pengguna tersebut memiliki saldo dompet digital yang besar di aplikasi tersebut. Tindakan preventif tingkat lanjut apa yang harus dilakukan?",
+        options: [
+          "Mengunduh file tersebut di perangkat lain yang tidak memiliki saldo untuk melihat isinya.",
+          "Menghubungi pihak loka pasar untuk meminta ganti rugi atas gangguan privasi dari nomor tak dikenal.",
+          "Memindahkan semua saldo ke rekening bank lain melalui koneksi Wi-Fi publik agar lebih cepat.",
+          "Menghapus file tersebut, memblokir nomor pengirim, dan mengaktifkan fitur biometrik serta PIN yang berbeda antara ponsel dan aplikasi perbankan.",
+          "Segera menginstal file tersebut untuk memastikan barang sampai tepat waktu agar saldo tidak hangus."
+        ],
+        answer: 3,
+        explanation: "Modus pembagian berkas APK berbahaya bertindak sebagai malware sniffer SMS/OTP. Menolak instalasi, menghapus berkas, memblokir nomor asing, dan membuat pin bervariasi adalah langkah terbaik."
+      },
+      {
+        id: 39,
+        question: "Seorang pelaku UMKM di bidang kuliner mulai menggunakan sistem pembayaran QRIS yang terintegrasi dengan rekening digitalnya. Dalam konteks pengelolaan keuangan usaha, manakah analisis yang paling tepat terkait dampak penggunaan teknologi tersebut?",
+        options: [
+          "Terjadinya peningkatan kedekatan sosial dengan pelanggan karena proses transaksi lebih praktis.",
+          "Meningkatnya posisi tawar terhadap pemasok akibat adanya rekam jejak transaksi digital.",
+          "Terciptanya sistem pencatatan keuangan yang lebih akurat dan efisien melalui otomatisasi transaksi.",
+          "Kemudahan dalam memperoleh pinjaman usaha karena adanya riwayat transaksi berbasis QRIS.",
+          "Berkurangnya kebutuhan promosi karena metode pembayaran digital lebih menarik bagi pelanggan."
+        ],
+        answer: 2,
+        explanation: "Sistem QRIS mengotomatisasi log laporan transaksi sehingga menyingkirkan kesalahan pencatatan manual dan memfasilitasi rekonsiliasi kas usaha secara langsung."
+      },
+      {
+        id: 40,
+        question: "Fenomena meningkatnya penggunaan layanan Paylater dalam transaksi belanja online menunjukkan adanya perubahan perilaku konsumen. Jika dianalisis dari sudut pandang kebutuhan finansial, manakah kesimpulan yang paling tepat terkait alasan utama konsumen memilih metode tersebut?",
+        options: [
+          "Konsumen ingin memiliki fleksibilitas dalam menunda pembayaran untuk mengatur arus keuangan.",
+          "Konsumen berusaha menghindari biaya tambahan dalam setiap transaksi.",
+          "Konsumen lebih mengutamakan tingkat keamanan tertinggi dalam bertransaksi.",
+          "Konsumen tidak lagi mempercayai metode pembayaran digital lainnya.",
+          "Konsumen tertarik karena adanya program loyalitas yang lebih menguntungkan"
+        ],
+        answer: 0,
+        explanation: "Metode pembayaran cicilan instant (Paylater) digemari karena memberikan keleluasaan bagi pembeli untuk mengendalikan arus kas pemasukan dan pengeluaran bulanan mereka."
+      }
+    ];
+
+    // APPLICATION STATE
+    let currentStudent = { nama: '', kelas: '' };
+    let studentAnswers = Array(40).fill(null);
+    let activeIndex = 0;
+    let warningCount = 0;
+    let timerDuration = 90 * 60; // 90 Minutes in seconds
+    let examInterval = null;
+    let isExamFinished = false;
+    let isExamActive = false;
+
+    // FIREBASE STATE & INITIALIZATION
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'SMAN1-NGAMBUR-SAS-2026';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+      apiKey: "",
+      authDomain: "mock-project.firebaseapp.com",
+      projectId: "mock-project",
+      storageBucket: "mock-project.appspot.com",
+      messagingSenderId: "12345",
+      appId: "1:12345:web:123"
+    };
+
+    // Initialize Firebase if config fields are valid, otherwise gracefully fall back to local memory.
+    let db = null;
+    let auth = null;
+    try {
+      if (firebaseConfig.projectId && firebaseConfig.projectId !== "mock-project") {
+        const app = firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth(app);
+        db = firebase.firestore(app);
+        
+        const initAuth = async () => {
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await auth.signInWithCustomToken(__initial_auth_token).catch(() => auth.signInAnonymously());
+          } else {
+            await auth.signInAnonymously().catch(e => console.log("Auth silent bypass:", e));
+          }
+        };
+        initAuth();
+      }
+    } catch(e) {
+      console.warn("Firebase Init fallback:", e);
+    }
+
+    // ON LOAD INITIALIZER
+    window.onload = function() {
+      // Warm up UI components
+      initAntiCheat();
+    }
+
+    // TOAST / SYSTEM NOTIFICATION
+    function showToast(text, isError = false) {
+      const toast = document.getElementById('custom-toast');
+      const toastText = document.getElementById('toast-text');
+      const toastIcon = document.getElementById('toast-icon');
+      
+      toastText.innerText = text;
+      toastIcon.innerHTML = isError ? 
+        '<i class="fa-solid fa-circle-exclamation text-rose-500"></i>' : 
+        '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+      
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    // LOGIN LOGIC
+    function prosesLogin() {
+      const nama = document.getElementById('input-nama').value.trim();
+      const kelas = document.getElementById('select-kelas').value;
+      const token = document.getElementById('input-token').value.trim();
+
+      if (!nama) {
+        showToast("Nama siswa wajib diisi!", true);
+        return;
+      }
+      if (nama.length < 3) {
+        showToast("Masukkan nama lengkap yang valid!", true);
+        return;
+      }
+      if (!kelas) {
+        showToast("Pilih kelas Anda!", true);
+        return;
+      }
+      if (token !== "ASAS2026") {
+        showToast("Token ujian salah atau tidak valid!", true);
+        return;
+      }
+
+      // Successful Registration
+      currentStudent.nama = nama;
+      currentStudent.kelas = kelas;
+      
+      // Update UI identity card
+      document.getElementById('avatar-initial').innerText = nama.charAt(0).toUpperCase();
+      document.getElementById('identity-nama').innerText = nama;
+      document.getElementById('identity-kelas').innerText = `Kelas ${kelas}`;
+
+      // Switch Screens
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-exam').classList.remove('hidden');
+      document.getElementById('header-timer').classList.remove('hidden');
+
+      isExamActive = true;
+      startTimer();
+      renderActiveQuestion();
+      renderNavigationGrid();
+      showToast(`Selamat datang ${nama}. Ujian dimulai!`);
+
+      // Try entering fullscreen to minimize casual cheat attempts
+      try {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        }
+      } catch(e) {}
+    }
+
+    // ANTI CHEAT SYSTEM (WINDOW BLUR DETECTION & VISIBILITY CHANGE)
+    function initAntiCheat() {
+      // Focus-loss or tab change tracking
+      window.addEventListener('blur', () => {
+        triggerCheatingWarning();
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          triggerCheatingWarning();
+        }
+      });
+    }
+
+    function triggerCheatingWarning() {
+      if (!isExamActive || isExamFinished) return;
+      
+      warningCount++;
+      
+      // Update sidebar violation count
+      const badge = document.getElementById('badge-warning');
+      badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation animate-bounce"></i> Pelanggaran: ${warningCount}/3`;
+      badge.classList.remove('bg-rose-50', 'text-rose-700');
+      badge.classList.add('bg-rose-600', 'text-white');
+
+      // Play default audio beep if supported
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // 800Hz beep
+        oscillator.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.3);
+      } catch(e) {}
+
+      if (warningCount >= 3) {
+        document.getElementById('modal-warning').classList.add('hidden');
+        showToast("Batas pelanggaran terlewati. Sistem mengunci jawaban!", true);
+        submitUjianSecaraOtomatis("Sistem mendeteksi 3 kali pelanggaran ganti tab.");
+      } else {
+        // Show Warning Lock Modal
+        document.getElementById('modal-warning-count').innerText = `${warningCount} / 3`;
+        document.getElementById('modal-warning').classList.remove('hidden');
+      }
+    }
+
+    function closeWarningModal() {
+      document.getElementById('modal-warning').classList.add('hidden');
+      showToast("Kembali mengerjakan. Harap jaga integritas!");
+    }
+
+    // TIMER WORKER
+    function startTimer() {
+      examInterval = setInterval(() => {
+        if (timerDuration <= 0) {
+          clearInterval(examInterval);
+          submitUjianSecaraOtomatis("Waktu pengerjaan 90 menit telah habis.");
+        } else {
+          timerDuration--;
+          const minutes = Math.floor(timerDuration / 60);
+          const seconds = timerDuration % 60;
+          document.getElementById('timer-text').innerText = 
+            `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+          // Warning red text when under 5 minutes
+          if (timerDuration < 300) {
+            document.getElementById('timer-text').classList.add('text-rose-500');
+          }
+        }
+      }, 1000);
+    }
+
+    // RENDER ACTIVE SOAL
+    function renderActiveQuestion() {
+      const currentQ = examQuestions[activeIndex];
+      document.getElementById('label-soal-aktif').innerText = `Soal ${activeIndex + 1} dari 40`;
+      document.getElementById('teks-soal').innerHTML = currentQ.question;
+
+      const containerOpsi = document.getElementById('container-opsi');
+      containerOpsi.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      currentQ.options.forEach((optText, index) => {
+        const isSelected = studentAnswers[activeIndex] === index;
+        
+        const optionButton = document.createElement('button');
+        optionButton.onclick = () => selectOption(index);
+        optionButton.className = `w-full text-left p-4 rounded-xl border transition flex items-start gap-4 ${
+          isSelected ? 
+          'bg-emerald-50/80 border-emerald-500 text-emerald-900 ring-1 ring-emerald-500' : 
+          'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+        }`;
+
+        optionButton.innerHTML = `
+          <span class="flex items-center justify-center w-6 h-6 rounded-lg text-xs font-bold ${
+            isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'
+          }">${letters[index]}</span>
+          <span class="flex-1 text-sm leading-relaxed">${optText}</span>
+        `;
+        containerOpsi.appendChild(optionButton);
+      });
+
+      // Update Navigation Buttons State
+      document.getElementById('btn-prev').disabled = activeIndex === 0;
+      document.getElementById('btn-prev').className = activeIndex === 0 ? 
+        'px-5 py-2.5 rounded-xl border border-slate-100 text-slate-300 font-semibold text-sm cursor-not-allowed transition flex items-center gap-2' :
+        'px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition flex items-center gap-2';
+
+      if (activeIndex === 39) {
+        document.getElementById('btn-next').innerHTML = `Selesai <i class="fa-solid fa-circle-check text-emerald-400"></i>`;
+        document.getElementById('btn-next').className = 'px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm transition flex items-center gap-2';
+      } else {
+        document.getElementById('btn-next').innerHTML = `Berikutnya <i class="fa-solid fa-chevron-right text-xs"></i>`;
+        document.getElementById('btn-next').className = 'px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm transition flex items-center gap-2';
+      }
+    }
+
+    function selectOption(index) {
+      if (isExamFinished) return;
+      studentAnswers[activeIndex] = index;
+      renderActiveQuestion();
+      renderNavigationGrid();
+    }
+
+    function keSoalSebelumnya() {
+      if (activeIndex > 0) {
+        activeIndex--;
+        renderActiveQuestion();
+        renderNavigationGrid();
+      }
+    }
+
+    function keSoalBerikutnya() {
+      if (activeIndex < 39) {
+        activeIndex++;
+        renderActiveQuestion();
+        renderNavigationGrid();
+      } else {
+        mintaKonfirmasiSelesai();
+      }
+    }
+
+    // NOMOR NAVIGASI GRID
+    function renderNavigationGrid() {
+      const grid = document.getElementById('grid-soal');
+      grid.innerHTML = '';
+
+      let answeredCount = 0;
+      for (let i = 0; i < 40; i++) {
+        const isAnswered = studentAnswers[i] !== null;
+        if (isAnswered) answeredCount++;
+
+        const isActive = activeIndex === i;
+
+        const btn = document.createElement('button');
+        btn.onclick = () => lompatKeSoal(i);
+        btn.innerText = i + 1;
+        
+        let styleClass = "h-10 text-xs font-bold rounded-xl border transition flex items-center justify-center ";
+        if (isActive) {
+          styleClass += "bg-indigo-600 border-indigo-600 text-white ring-2 ring-indigo-200";
+        } else if (isAnswered) {
+          styleClass += "bg-emerald-600 border-emerald-600 text-white shadow shadow-emerald-600/10";
+        } else {
+          styleClass += "bg-white border-slate-200 text-slate-600 hover:bg-slate-50";
+        }
+
+        btn.className = styleClass;
+        grid.appendChild(btn);
+      }
+
+      document.getElementById('nav-answered-badge').innerText = `${answeredCount} / 40 Terjawab`;
+    }
+
+    function lompatKeSoal(index) {
+      activeIndex = index;
+      renderActiveQuestion();
+      renderNavigationGrid();
+    }
+
+    // SUBMIT & VALIDATION
+    function mintaKonfirmasiSelesai() {
+      const answeredCount = studentAnswers.filter(ans => ans !== null).length;
+      const unanswered = 40 - answeredCount;
+      
+      let confirmMsg = `Apakah Anda yakin ingin menyelesaikan ujian ini?\n\nIdentitas: ${currentStudent.nama}\nJumlah Terjawab: ${answeredCount} Soal\nBelum Terjawab: ${unanswered} Soal\nSisa Waktu: ${document.getElementById('timer-text').innerText}`;
+      
+      if (unanswered > 0) {
+        confirmMsg += `\n\nPERINGATAN: Terdapat ${unanswered} soal yang belum Anda isi!`;
+      }
+
+      if (confirm(confirmMsg)) {
+        submitUjianSecaraOtomatis("Siswa menyerahkan jawaban secara sadar.");
+      }
+    }
+
+    async function submitUjianSecaraOtomatis(reason) {
+      if (isExamFinished) return;
+      isExamFinished = true;
+      isExamActive = false;
+      clearInterval(examInterval);
+
+      // Hide timer
+      document.getElementById('header-timer').classList.add('hidden');
+
+      // Calculate score
+      let correctAnswersCount = 0;
+      let wrongAnswersCount = 0;
+
+      examQuestions.forEach((q, idx) => {
+        if (studentAnswers[idx] === q.answer) {
+          correctAnswersCount++;
+        } else {
+          wrongAnswersCount++;
+        }
+      });
+
+      const finalScore = correctAnswersCount * 2.5; // Each question is worth 2.5, total max 100
+
+      // Update Result Page Banner
+      document.getElementById('res-score').innerText = finalScore.toFixed(1).replace('.0', '');
+      document.getElementById('res-correct').innerText = `${correctAnswersCount} / 40`;
+      document.getElementById('res-wrong').innerText = `${wrongAnswersCount} / 40`;
+      document.getElementById('res-violations').innerText = `${warningCount} / 3`;
+      document.getElementById('res-nama-siswa').innerText = `Nama: ${currentStudent.nama}`;
+      document.getElementById('res-kelas-siswa').innerText = `Kelas: ${currentStudent.kelas}`;
+
+      // Populate detailed review list
+      renderReviewList();
+
+      // Switch Screens
+      document.getElementById('screen-exam').classList.add('hidden');
+      document.getElementById('screen-result').classList.remove('hidden');
+
+      // Try exiting fullscreen
+      try {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      } catch(e) {}
+
+      // Write result to Database (Firestore) using strict paths
+      const submissionData = {
+        nama: currentStudent.nama,
+        kelas: currentStudent.kelas,
+        benar: correctAnswersCount,
+        salah: wrongAnswersCount,
+        pelanggaran: warningCount,
+        nilai: finalScore,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() || new Date().toISOString(),
+        alasanSubmit: reason
+      };
+
+      // Save locally to localstorage just as a backup
+      const history = JSON.parse(localStorage.getItem('sas_local_grades') || '[]');
+      history.push(submissionData);
+      localStorage.setItem('sas_local_grades', JSON.stringify(history));
+
+      if (db) {
+        // RULE 1: Strict path for public sharing/retrieval
+        const docRef = db.doc(`artifacts/${appId}/public/data/nilai_siswa/${Date.now()}_${currentStudent.nama.replace(/\s+/g, '_')}`);
+        await docRef.set(submissionData).then(() => {
+          showToast("Data nilai Anda berhasil dikunci & disinkronkan ke server sekolah.");
+        }).catch(err => {
+          console.error("Firestore sync error:", err);
+          showToast("Tersimpan secara lokal. Gagal tersambung ke server.", true);
+        });
+      } else {
+        showToast("Nilai tersimpan di memori lokal peramban.");
+      }
+    }
+
+    // RENDER DETAILED pembahas / REVIEW CARDS
+    function renderReviewList() {
+      const container = document.getElementById('review-list-container');
+      container.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+
+      examQuestions.forEach((q, idx) => {
+        const studentAnsIdx = studentAnswers[idx];
+        const isCorrect = studentAnsIdx === q.answer;
+
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-xl border p-5 space-y-4 shadow-sm relative overflow-hidden ${
+          isCorrect ? 'border-l-4 border-l-emerald-500 border-slate-100' : 'border-l-4 border-l-rose-500 border-slate-100'
+        }`;
+
+        const badgeClass = isCorrect ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700';
+        const badgeIcon = isCorrect ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
+        const badgeText = isCorrect ? 'Benar (+2,5)' : 'Salah (0)';
+
+        let studentChoiceText = studentAnsIdx !== null ? `${letters[studentAnsIdx]}. ${q.options[studentAnsIdx]}` : "Tidak menjawab";
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-slate-500">Soal Nomor ${idx + 1}</span>
+            <span class="${badgeClass} px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <i class="${badgeIcon}"></i> ${badgeText}
+            </span>
+          </div>
+
+          <p class="text-slate-800 text-sm font-medium leading-relaxed">${q.question}</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 bg-slate-50 rounded-lg space-y-1">
+              <span class="text-slate-400 font-semibold block">Jawaban Anda:</span>
+              <span class="font-bold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">${studentChoiceText}</span>
+            </div>
+            <div class="p-3 bg-emerald-50/50 rounded-lg space-y-1">
+              <span class="text-emerald-600 font-semibold block">Kunci Jawaban:</span>
+              <span class="font-bold text-emerald-800">${letters[q.answer]}. ${q.options[q.answer]}</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 border border-slate-100 rounded-xl text-xs space-y-1.5">
+            <span class="font-bold text-slate-700 flex items-center gap-1">
+              <i class="fa-solid fa-lightbulb text-amber-500"></i> Penjelasan / Alasan Ilmiah:
+            </span>
+            <p class="text-slate-600 leading-relaxed italic">${q.explanation}</p>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // ADMIN/GURU PANEL GATE
+    function openAdminGate() {
+      document.getElementById('modal-admin-lock').classList.remove('hidden');
+      document.getElementById('input-admin-pin').value = '';
+      document.getElementById('input-admin-pin').focus();
+    }
+
+    function closeAdminLock() {
+      document.getElementById('modal-admin-lock').classList.add('hidden');
+    }
+
+    function submitAdminPIN() {
+      const pin = document.getElementById('input-admin-pin').value.trim();
+      if (pin === "GURU2026") {
+        document.getElementById('modal-admin-lock').classList.add('hidden');
+        masukDashboardAdmin();
+      } else {
+        alert("PIN Guru salah! Akses ditolak.");
+      }
+    }
+
+    let adminGradesList = [];
+
+    function masukDashboardAdmin() {
+      // Hide all other screens, open admin
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-exam').classList.add('hidden');
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-admin').classList.remove('hidden');
+
+      refreshDataAdmin();
+    }
+
+    function keluarAdmin() {
+      document.getElementById('screen-admin').classList.add('hidden');
+      if (isExamFinished) {
+        document.getElementById('screen-result').classList.remove('hidden');
+      } else if (isExamActive) {
+        document.getElementById('screen-exam').classList.remove('hidden');
+        document.getElementById('header-timer').classList.remove('hidden');
+      } else {
+        document.getElementById('screen-login').classList.remove('hidden');
+      }
+    }
+
+    async function refreshDataAdmin() {
+      const tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">Menghubungkan & mendownload berkas nilai dari server...</td></tr>';
+
+      // Load locally stored history as baseline
+      let localGrades = JSON.parse(localStorage.getItem('sas_local_grades') || '[]');
+      
+      // Load from Firestore
+      let firestoreGrades = [];
+      if (db) {
+        try {
+          // RULE 2: Keep queries simple and sort/filter inside JS memory to avoid index requirements
+          const querySnapshot = await db.collection(`artifacts/${appId}/public/data/nilai_siswa`).get();
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            firestoreGrades.push({
+              nama: data.nama,
+              kelas: data.kelas,
+              benar: data.benar,
+              salah: data.salah,
+              pelanggaran: data.pelanggaran,
+              nilai: data.nilai,
+              timestamp: data.timestamp ? (data.timestamp.seconds ? new Date(data.timestamp.seconds * 1000) : new Date(data.timestamp)) : new Date()
+            });
+          });
+        } catch(e) {
+          console.warn("Could not load from firestore:", e);
+        }
+      }
+
+      // Merge and deduplicate by (Nama + Kelas + Nilai)
+      const merged = [...firestoreGrades];
+      localGrades.forEach(localItem => {
+        const alreadyExists = merged.some(item => 
+          item.nama.toLowerCase() === localItem.nama.toLowerCase() && 
+          item.kelas === localItem.kelas && 
+          Math.abs(item.nilai - localItem.nilai) < 0.01
+        );
+        if (!alreadyExists) {
+          merged.push({
+            ...localItem,
+            timestamp: localItem.timestamp ? new Date(localItem.timestamp) : new Date()
+          });
+        }
+      });
+
+      // Sort by score descending, then by timestamp
+      merged.sort((a,b) => b.nilai - a.nilai);
+      adminGradesList = merged;
+
+      applyAdminFilter();
+    }
+
+    function applyAdminFilter() {
+      const classFilter = document.getElementById('filter-admin-kelas').value;
+      const tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = adminGradesList.filter(item => {
+        if (classFilter === 'ALL') return true;
+        return item.kelas === classFilter;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">Tidak ada data hasil siswa yang sesuai filter.</td></tr>';
+        return;
+      }
+
+      filtered.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-50/80 transition";
+
+        // Format Date
+        let dateString = "-";
+        if (item.timestamp) {
+          const date = new Date(item.timestamp);
+          dateString = date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+
+        row.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-400">${index + 1}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${item.nama}</td>
+          <td class="py-3 px-4"><span class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded font-medium text-xs">${item.kelas}</span></td>
+          <td class="py-3 px-4 text-slate-500 text-xs">${dateString}</td>
+          <td class="py-3 px-4 text-center font-bold text-emerald-600">${item.benar}</td>
+          <td class="py-3 px-4 text-center font-bold text-rose-500">${item.salah}</td>
+          <td class="py-3 px-4 text-center">
+            <span class="px-2 py-0.5 rounded text-xs font-bold ${
+              item.pelanggaran > 0 ? 'bg-rose-50 text-rose-700 border border-rose-100' : 'bg-slate-100 text-slate-500'
+            }">${item.pelanggaran} Kali</span>
+          </td>
+          <td class="py-3 px-4 text-right font-extrabold text-indigo-700 text-base">${item.nilai.toFixed(1).replace('.0', '')}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // EXPORT GRADES TO CSV FOR SPREADSHEETS
+    function exportToCSV() {
+      if (adminGradesList.length === 0) {
+        alert("Tidak ada data siswa untuk diekspor!");
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "No,Nama Siswa,Kelas,Waktu Submit,Jumlah Benar,Jumlah Salah,Jumlah Pelanggaran,Nilai Akhir\n";
+
+      adminGradesList.forEach((item, index) => {
+        let dateString = "-";
+        if (item.timestamp) {
+          const date = new Date(item.timestamp);
+          dateString = date.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+        }
+        
+        // Escape quotes
+        const safeName = item.nama.replace(/"/g, '""');
+        csvContent += `"${index + 1}","${safeName}","${item.kelas}","${dateString}","${item.benar}","${item.salah}","${item.pelanggaran}","${item.nilai}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Hasil_SAS_Informatika_SMAN1_Ngambur_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Spreadsheet (CSV) berhasil diunduh!");
+    }
+  </script>
+
+</body>
+</html>
